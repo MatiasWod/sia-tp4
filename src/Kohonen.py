@@ -29,6 +29,8 @@ class Kohonen:
         self.initial_sigma = sigma
         self.sigma = sigma
 
+        self.bmu_count = np.zeros(self.map_size, dtype=int)
+
         self.normalization = normalization.lower()
         if self.normalization == 'minmax':
             self.scaler = MinMaxScaler()
@@ -158,6 +160,8 @@ class Kohonen:
                 # Find best matching unit
                 bmu_pos = self.find_bmu(input_vector)
 
+                self.bmu_count[bmu_pos] += 1
+
                 # Update weights
                 self.update_weights(input_vector, bmu_pos, current_iteration, total_iterations)
 
@@ -193,3 +197,6 @@ class Kohonen:
         weights_2d = self.weights.reshape(-1, self.input_dim)
         original_weights_2d = self.inverse_transform(weights_2d)
         return original_weights_2d.reshape(weights_shape)
+
+    def get_bmu_counts(self):
+        return self.bmu_count

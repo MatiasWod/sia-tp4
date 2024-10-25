@@ -98,3 +98,15 @@ plt.xticks(np.arange(map_size[1]), np.arange(map_size[1]))  # Marcas en x desde 
 plt.yticks(np.arange(map_size[0]), np.arange(map_size[0]))  # Marcas en y desde 0 hasta map_size[0]-1
 
 plt.show()
+
+#Grafico para ver las neuronas muertas
+bmu_count = som.get_bmu_counts()
+plt.figure(figsize=(8, 8))
+plt.imshow(bmu_count, cmap='Blues', interpolation='nearest')
+plt.colorbar(label='BMU Count')
+plt.title('Frequency of BMU Selection')
+
+plt.xticks(np.arange(bmu_count.shape[1]), np.arange(bmu_count.shape[1]))
+plt.yticks(np.arange(bmu_count.shape[0]), np.arange(bmu_count.shape[0]))
+
+plt.show()
