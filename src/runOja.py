@@ -15,9 +15,9 @@ iterations = 100
 learning_rate = 0.01
 random_seed = 42
 
-oja_model = Oja(normalized_data, input_data_len, iterations, learning_rate, random_seed=random_seed)
+oja_model = Oja(normalized_data, input_data_len, learning_rate, random_seed=random_seed)
 
-oja_model.train()
+oja_model.train(iterations)
 
 final_weights = oja_model.get_weights()
 print("Final weights:", final_weights)
