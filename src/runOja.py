@@ -2,7 +2,7 @@ import pandas as pd
 from matplotlib import pyplot as plt
 from sklearn.preprocessing import StandardScaler
 
-from src.Oja import Oja
+from src.Models.Oja import Oja
 
 data = pd.read_csv('./raw_data/europe.csv')
 scaler = StandardScaler()

@@ -1,5 +1,5 @@
 import numpy as np
-from src.Hopfield import HopfieldNetwork
+from src.Models.Hopfield import HopfieldNetwork
 
 def read_matrices_from_file(filename):
     matrices = []

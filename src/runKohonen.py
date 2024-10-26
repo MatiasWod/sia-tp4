@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
-from src.Kohonen import Kohonen
+from src.Models.Kohonen import Kohonen
 
 # Cargar el dataset desde el archivo CSV
 data = pd.read_csv('./raw_data/europe.csv')
