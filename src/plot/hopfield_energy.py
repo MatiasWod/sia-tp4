@@ -1,7 +1,7 @@
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import numpy as np
-from src.Hopfield import HopfieldNetwork
+from src.Models.Hopfield import HopfieldNetwork
 from src.Utils.alphabet import read_matrices_from_file
 
 # Inicializar la red Hopfield
@@ -24,7 +24,7 @@ worst_subset = [matrices[7], matrices[12], matrices[13], matrices[22]]
 network.train(best_subset2)
 
 # Crear un patrón con ruido
-noisy_pattern = network.add_noise(best_subset2[0], noise_level=0.0)
+noisy_pattern = network.add_noise(best_subset2[0], noise_level=0.08)
 
 print(noisy_pattern)
 
@@ -68,22 +68,25 @@ fig_states = make_subplots(
 for idx, state in enumerate(state_evolution):
     fig_states.add_trace(
         go.Heatmap(
-            z=state,
+            z=state,  # Keep original state
             colorscale='Greys',
-            showscale=False,
+            showscale=False
         ),
         row=1, col=idx + 1
     )
 
-# Configurar layout para ocultar los ejes de las matrices
+# Reverse the y-axes of all subplots to avoid flipping the pattern
+for i in range(num_steps):
+    fig_states.update_yaxes(
+        autorange='reversed',  # Reverse the y-axis display
+        row=1, col=i + 1
+    )
+    fig_states.update_xaxes(visible=False, row=1, col=i + 1)
+    fig_states.update_yaxes(visible=False, row=1, col=i + 1)
+
 fig_states.update_layout(
     title='Evolución de Estados',
     template='plotly_white'
 )
-
-# Ocultar los ejes de cada subplot
-for i in range(num_steps):
-    fig_states.update_xaxes(visible=False, row=1, col=i + 1)
-    fig_states.update_yaxes(visible=False, row=1, col=i + 1)
 
 fig_states.show()
