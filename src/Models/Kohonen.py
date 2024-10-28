@@ -43,28 +43,6 @@ class Kohonen:
         self.neuron_positions = np.array([[(i, j) for j in range(map_size[1])]
                                           for i in range(map_size[0])])
 
-    def normalize_data(self, data, fit=True):
-        """
-        Normalize the input data
-
-        Args:
-        data : numpy.array
-            Input data to normalize
-        fit : bool
-            Whether to fit the scaler with this data
-
-        Returns:
-        numpy.array
-            Normalized data
-        """
-        # Reshape data
-        if len(data.shape) == 1:
-            data = data.reshape(1, -1)
-
-        if fit:
-            return self.scaler.fit_transform(data)
-        return self.scaler.transform(data)
-
     def inverse_transform(self, data):
         """
         Convert normalized data back to original scale
@@ -139,18 +117,16 @@ class Kohonen:
         """Calculate sigma (neighborhood radius) decay"""
         return self.initial_sigma * np.exp(-iteration / total_iterations)
 
-    def train(self, data, epochs=100):
+    def train(self, normalized_data, epochs=100):
         """
         Train the SOM on the input data
 
         Args:
-        data : numpy.array
+        normalized_data : numpy.array
             Training data array (n_samples, input_dim)
         epochs : int
             Number of training epochs
         """
-        # Normalize training data
-        normalized_data = self.normalize_data(data)
 
         total_iterations = epochs * len(normalized_data)
         current_iteration = 0
@@ -167,20 +143,18 @@ class Kohonen:
 
                 current_iteration += 1
 
-    def transform(self, data):
+    def transform(self, normalized_data):
         """
         Transform input data to BMU coordinates
 
         Args:
-        data : numpy.array
+        normalized_data : numpy.array
             Input data array (n_samples, input_dim)
 
         Returns:
         numpy.array
             Array of BMU coordinates for each input sample
         """
-        # Normalize input data using fitted scaler
-        normalized_data = self.normalize_data(data, fit=False)
 
         bmu_coordinates = np.zeros((len(normalized_data), 2))
         for i, vector in enumerate(normalized_data):
