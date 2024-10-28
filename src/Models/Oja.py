@@ -11,7 +11,7 @@ class Oja:
         self.weights = np.random.rand(input_data_len)
 
     def train(self, iterations):
-        for index, _ in enumerate(range(self.iterations)):
+        for index, _ in enumerate(range(iterations)):
             current_lr = self.initial_learning_rate / (index + 1)
             for data in self.input_data:
                 out = np.dot(data, self.weights)
