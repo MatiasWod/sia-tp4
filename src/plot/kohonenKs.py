@@ -17,7 +17,7 @@ scaler = StandardScaler()
 standardized_features = scaler.fit_transform(features)
 
 # Definir los valores de k
-k_values = [3,4,5]
+k_values = [4]
 
 # Función para calcular y graficar la matriz U
 def calculate_u_matrix(som):
@@ -101,9 +101,15 @@ for k in k_values:
     plt.figure(figsize=(8, 8))
     plt.imshow(u_matrix, cmap='Blues', interpolation='nearest')
     plt.colorbar(label='Distancia promedio')
-    plt.title(f'Mapa U - Distancias entre Neuronas Vecinas para k={k}')
+    plt.title(f'Kohonen - Distancias entre Neuronas Vecinas para k={k}')
     plt.xticks(np.arange(map_size[1]), np.arange(map_size[1]))
     plt.yticks(np.arange(map_size[0]), np.arange(map_size[0]))
+
+    # Añadir los valores de cada celda en el gráfico
+    for i in range(map_size[0]):
+        for j in range(map_size[1]):
+            plt.text(j, i, f"{u_matrix[i, j]:.2f}", ha='center', va='center', color='black')
+
     plt.show()
 
     # Gráfico de la frecuencia de selección de BMU
@@ -111,7 +117,13 @@ for k in k_values:
     plt.figure(figsize=(8, 8))
     plt.imshow(bmu_count, cmap='Blues', interpolation='nearest')
     plt.colorbar(label='BMU Count')
-    plt.title(f'Frecuencia de Selección de BMU para k={k}')
+    plt.title(f'Kohonen - Frecuencia de Selección de BMU para k={k}')
     plt.xticks(np.arange(bmu_count.shape[1]), np.arange(bmu_count.shape[1]))
     plt.yticks(np.arange(bmu_count.shape[0]), np.arange(bmu_count.shape[0]))
+
+    # Añadir los valores de cada celda en el gráfico
+    for i in range(bmu_count.shape[0]):
+        for j in range(bmu_count.shape[1]):
+            plt.text(j, i, f"{bmu_count[i, j]}", ha='center', va='center', color='black')
+
     plt.show()
