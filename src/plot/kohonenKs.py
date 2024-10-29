@@ -16,8 +16,10 @@ features = data[['Area', 'GDP', 'Inflation', 'Life.expect', 'Military', 'Pop.gro
 scaler = StandardScaler()
 standardized_features = scaler.fit_transform(features)
 
-# Definir los valores de k
-k_values = [4]
+# Definir los valores de k, sigma y learning_rate
+k_values = [4]  # Diferentes tamaños de mapa
+sigma_values = [3.0]  # Diferentes valores de sigma
+learning_rates = [0.1]  # Diferentes tasas de aprendizaje
 
 # Función para calcular y graficar la matriz U
 def calculate_u_matrix(som):
@@ -41,106 +43,98 @@ def random_color():
     return (random.random(), random.random(), random.random())
 
 for k in k_values:
-    map_size = (k, k)
-    input_dim = standardized_features.shape[1]
+    for sigma in sigma_values:
+        for lr in learning_rates:
+            map_size = (k, k)
+            input_dim = standardized_features.shape[1]
 
-    # Inicializar y entrenar el modelo
-    som = Kohonen(
-        input_dim=input_dim,
-        map_size=map_size,
-        learning_rate=0.1,
-        sigma=3.0,
-        normalization='zscore',
-        random_seed=41
-    )
-    som.train(standardized_features, epochs=500 * input_dim)
+            # Inicializar y entrenar el modelo
+            som = Kohonen(
+                input_dim=input_dim,
+                map_size=map_size,
+                learning_rate=lr,
+                sigma=sigma,
+                random_seed=41
+            )
+            som.train(standardized_features, epochs=500 * input_dim)
 
-    # Obtener posiciones BMU para cada país
-    bmu_coordinates = som.transform(standardized_features)
-    data['BMU'] = [tuple(coord) for coord in bmu_coordinates]
+            # Obtener posiciones BMU para cada país
+            bmu_coordinates = som.transform(standardized_features)
+            data['BMU'] = [tuple(coord) for coord in bmu_coordinates]
 
-    # Crear un diccionario para almacenar los países en cada celda
-    bmu_dict = {}
-    for _, row in data.iterrows():
-        bmu = row['BMU']
-        country = row['Country']
-        if bmu not in bmu_dict:
-            bmu_dict[bmu] = []
-        bmu_dict[bmu].append(country)
+            # Crear un diccionario para almacenar los países en cada celda
+            bmu_dict = {}
+            for _, row in data.iterrows():
+                bmu = row['BMU']
+                country = row['Country']
+                if bmu not in bmu_dict:
+                    bmu_dict[bmu] = []
+                bmu_dict[bmu].append(country)
 
-    # Gráfico del Mapa de Países Agrupados
-    fig, ax = plt.subplots(figsize=(8, 8))
-    cell_colors = {}
+            # Gráfico del Mapa de Países Agrupados
+            fig, ax = plt.subplots(figsize=(8, 8))
+            cell_colors = {}
 
-    for i in range(map_size[0]):
-        for j in range(map_size[1]):
-            # Obtener los países de la coordenada actual y asignarles un color si no existe
-            countries_in_cell = bmu_dict.get((i, j), [])
-            if (i, j) not in cell_colors:
-                cell_colors[(i, j)] = random_color()
+            for i in range(map_size[0]):
+                for j in range(map_size[1]):
+                    countries_in_cell = bmu_dict.get((i, j), [])
+                    if (i, j) not in cell_colors:
+                        cell_colors[(i, j)] = random_color()
 
-            # Dibujar la celda con un color de fondo
-            rect = Rectangle((j - 0.5, i - 0.5), 1, 1, color=cell_colors[(i, j)], alpha=0.3)
-            ax.add_patch(rect)
+                    rect = Rectangle((j - 0.5, i - 0.5), 1, 1, color=cell_colors[(i, j)], alpha=0.3)
+                    ax.add_patch(rect)
 
-            # Mostrar los nombres de los países en cada celda
-            text = "\n".join(countries_in_cell)
-            ax.text(j, i, text, ha='center', va='center', fontsize=8, color='black')
+                    text = "\n".join(countries_in_cell)
+                    ax.text(j, i, text, ha='center', va='center', fontsize=8, color='black')
 
-    # Configuración estética del gráfico
-    ax.set_xlim(-0.5, map_size[1] - 0.5)
-    ax.set_ylim(-0.5, map_size[0] - 0.5)
-    ax.set_xticks(np.arange(map_size[1]))
-    ax.set_yticks(np.arange(map_size[0]))
-    ax.invert_yaxis()
-    plt.title(f'Kohonen - Mapa de Países Agrupados para k={k}')
-    plt.show()
+            ax.set_xlim(-0.5, map_size[1] - 0.5)
+            ax.set_ylim(-0.5, map_size[0] - 0.5)
+            ax.set_xticks(np.arange(map_size[1]))
+            ax.set_yticks(np.arange(map_size[0]))
+            ax.invert_yaxis()
+            plt.title(f'Kohonen - Mapa de Países para k={k}, sigma={sigma}, lr={lr}')
+            plt.show()
 
-    # Gráfico de la matriz U (distancias promedio)
-    u_matrix = calculate_u_matrix(som)
-    plt.figure(figsize=(8, 8))
-    plt.imshow(u_matrix, cmap='Blues', interpolation='nearest')
-    plt.colorbar(label='Distancia promedio')
-    plt.title(f'Kohonen - Distancias entre Neuronas Vecinas para k={k}')
-    plt.xticks(np.arange(map_size[1]), np.arange(map_size[1]))
-    plt.yticks(np.arange(map_size[0]), np.arange(map_size[0]))
+            # Gráfico de la matriz U (distancias promedio)
+            u_matrix = calculate_u_matrix(som)
+            plt.figure(figsize=(8, 8))
+            plt.imshow(u_matrix, cmap='Blues', interpolation='nearest')
+            plt.colorbar(label='Distancia promedio')
+            plt.title(f'Kohonen - Distancias Vecinas para k={k}, sigma={sigma}, lr={lr}')
+            plt.xticks(np.arange(map_size[1]), np.arange(map_size[1]))
+            plt.yticks(np.arange(map_size[0]), np.arange(map_size[0]))
 
-    # Añadir los valores de cada celda en el gráfico
-    for i in range(map_size[0]):
-        for j in range(map_size[1]):
-            plt.text(j, i, f"{u_matrix[i, j]:.2f}", ha='center', va='center', color='black')
+            for i in range(map_size[0]):
+                for j in range(map_size[1]):
+                    plt.text(j, i, f"{u_matrix[i, j]:.2f}", ha='center', va='center', color='black')
 
-    plt.show()
+            plt.show()
 
-    # Gráfico de la frecuencia de selección de BMU
-    bmu_count = som.get_bmu_counts()
-    plt.figure(figsize=(8, 8))
-    plt.imshow(bmu_count, cmap='Blues', interpolation='nearest')
-    plt.colorbar(label='BMU Count')
-    plt.title(f'Kohonen - Frecuencia de Selección de BMU para k={k}')
-    plt.xticks(np.arange(bmu_count.shape[1]), np.arange(bmu_count.shape[1]))
-    plt.yticks(np.arange(bmu_count.shape[0]), np.arange(bmu_count.shape[0]))
+            # Gráfico de la frecuencia de selección de BMU
+            bmu_count = som.get_bmu_counts()
+            plt.figure(figsize=(8, 8))
+            plt.imshow(bmu_count, cmap='Blues', interpolation='nearest')
+            plt.colorbar(label='BMU Count')
+            plt.title(f'Kohonen - Frecuencia de BMU para k={k}, sigma={sigma}, lr={lr}')
+            plt.xticks(np.arange(bmu_count.shape[1]), np.arange(bmu_count.shape[1]))
+            plt.yticks(np.arange(bmu_count.shape[0]), np.arange(bmu_count.shape[0]))
 
-    # Añadir los valores de cada celda en el gráfico
-    for i in range(bmu_count.shape[0]):
-        for j in range(bmu_count.shape[1]):
-            plt.text(j, i, f"{bmu_count[i, j]}", ha='center', va='center', color='black')
+            for i in range(bmu_count.shape[0]):
+                for j in range(bmu_count.shape[1]):
+                    plt.text(j, i, f"{bmu_count[i, j]}", ha='center', va='center', color='black')
 
-    plt.show()
+            plt.show()
 
-    for idx, column in enumerate(features.columns):
-        # Obtener la matriz de pesos de la variable actual
-        variable_weights = som.get_weights()[:, :, idx]
+            for idx, column in enumerate(features.columns):
+                variable_weights = som.get_weights()[:, :, idx]
+                plt.figure(figsize=(8, 8))
+                plt.imshow(variable_weights, cmap='viridis', interpolation='nearest')
+                plt.colorbar(label=f'Peso')
+                plt.title(f'Kohonen - Influencia de {column} para k={k}, sigma={sigma}, lr={lr}')
+                plt.xticks(np.arange(map_size[1]), np.arange(map_size[1]))
+                plt.yticks(np.arange(map_size[0]), np.arange(map_size[0]))
 
-        plt.figure(figsize=(8, 8))
-        plt.imshow(variable_weights, cmap='viridis', interpolation='nearest')
-        plt.colorbar(label=f'Peso')
-        plt.title(f'Kohonen - Influencia de la Variable {column} en k={k}')
-        plt.xticks(np.arange(map_size[1]), np.arange(map_size[1]))
-        plt.yticks(np.arange(map_size[0]), np.arange(map_size[0]))
-
-        # Añadir los valores de cada celda en el gráfico
-        for i in range(map_size[0]):
-            for j in range(map_size[1]):
-                plt.text(j, i, f"{variable_weights[i, j]:.2f}", ha='center', va='center', color='black')
-        plt.show()
+                for i in range(map_size[0]):
+                    for j in range(map_size[1]):
+                        plt.text(j, i, f"{variable_weights[i, j]:.2f}", ha='center', va='center', color='black')
+                plt.show()

@@ -2,8 +2,7 @@ import numpy as np
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
 class Kohonen:
-    def __init__(self, input_dim, map_size=(2, 2), learning_rate=0.5, sigma=1.0,
-                 normalization='zscore', random_seed=None):
+    def __init__(self, input_dim, map_size=(2, 2), learning_rate=0.5, sigma=1.0, random_seed=None):
         """
         Args:
         input_dim : int
@@ -14,8 +13,6 @@ class Kohonen:
             Initial learning rate
         sigma : float
             Initial neighborhood radius
-        normalization : str
-            Type of normalization ('minmax' or 'zscore')
         random_seed : int
             Seed for reproducibility
         """
@@ -30,14 +27,6 @@ class Kohonen:
         self.sigma = sigma
 
         self.bmu_count = np.zeros(self.map_size, dtype=int)
-
-        self.normalization = normalization.lower()
-        if self.normalization == 'minmax':
-            self.scaler = MinMaxScaler()
-        elif self.normalization == 'zscore':
-            self.scaler = StandardScaler()
-        else:
-            raise ValueError("Normalization must be 'minmax' or 'zscore'")
 
         self.weights = np.random.rand(map_size[0], map_size[1], input_dim)
         self.neuron_positions = np.array([[(i, j) for j in range(map_size[1])]
