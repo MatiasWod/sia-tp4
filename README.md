@@ -29,22 +29,16 @@ In this project, we implement unsupervised learning algorithms: **Hopfield**, **
 python -m src.runKohonen
 ```
 
-### Config file
-```json
-{
-  
-}
-```
-
 ### Run Oja:
 ```bash
 python -m src.runOja
 ```
 
-### Config file
+### Oja: config file
 ```json
 {
-  
+  "iterations": 10000,
+  "learning_rate": 0.001
 }
 ```
 
