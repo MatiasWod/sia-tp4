@@ -11,8 +11,8 @@ normalized_data = scaler.fit_transform(data[numerical_cols])
 normalized_df = pd.DataFrame(normalized_data, columns=numerical_cols)
 
 input_data_len = normalized_data.shape[1]
-iterations = 100
-learning_rate = 0.01
+iterations = 10000
+learning_rate = 0.001
 random_seed = 42
 
 oja_model = Oja(normalized_data, input_data_len, learning_rate, random_seed=random_seed)
@@ -27,10 +27,41 @@ print("Final weights:", final_weights)
 pca_evals = oja_model.evaluate(normalized_data)
 
 countries = data.iloc[:, 0]
-plt.figure(figsize=(12, 6))
-plt.bar(countries, pca_evals)
-plt.xticks(rotation=90)
-plt.xlabel('Country')
-plt.ylabel('PCA 1')
-plt.title('PCA 1 Analysis for Countries with Oja')
+plt.figure(figsize=(12, 8))
+bars = plt.bar(countries, pca_evals)
+plt.xticks(rotation=90, fontsize=20)
+plt.xlabel('Country', fontsize=20)
+plt.ylabel('PC 1', fontsize=20)
+plt.title('PC 1 Analysis for Countries with Oja', fontsize=20)
+plt.tight_layout()
+
+for bar in bars:
+    yval = bar.get_height()
+    plt.text(bar.get_x() + bar.get_width() / 2, yval, round(yval, 2),
+             ha='center', va='bottom', fontsize=12, color="black")
+
+plt.show()
+
+#ANALYSIS 2
+pca_evals = oja_model.evaluate(normalized_data)
+countries = data.iloc[:, 0].values  # Adjust this if needed
+
+combined = list(zip(countries, pca_evals))
+sorted_combined = sorted(combined, key=lambda x: x[1], reverse=True)
+sorted_countries, sorted_pca_evals = zip(*sorted_combined)
+
+
+plt.figure(figsize=(12, 8))
+bars = plt.bar(sorted_countries, sorted_pca_evals)
+plt.xticks(rotation=90, fontsize=20)
+plt.xlabel('Country', fontsize=20)
+plt.ylabel('PC 1', fontsize=20)
+plt.title('PC 1 Analysis for Countries with Oja', fontsize=20)
+plt.tight_layout()
+
+for bar in bars:
+    yval = bar.get_height()
+    plt.text(bar.get_x() + bar.get_width() / 2, yval, round(yval, 2),
+             ha='center', va='bottom', fontsize=12, color="black")
+
 plt.show()
