@@ -127,3 +127,20 @@ for k in k_values:
             plt.text(j, i, f"{bmu_count[i, j]}", ha='center', va='center', color='black')
 
     plt.show()
+
+    for idx, column in enumerate(features.columns):
+        # Obtener la matriz de pesos de la variable actual
+        variable_weights = som.get_weights()[:, :, idx]
+
+        plt.figure(figsize=(8, 8))
+        plt.imshow(variable_weights, cmap='viridis', interpolation='nearest')
+        plt.colorbar(label=f'Peso')
+        plt.title(f'Kohonen - Influencia de la Variable {column} en k={k}')
+        plt.xticks(np.arange(map_size[1]), np.arange(map_size[1]))
+        plt.yticks(np.arange(map_size[0]), np.arange(map_size[0]))
+
+        # Añadir los valores de cada celda en el gráfico
+        for i in range(map_size[0]):
+            for j in range(map_size[1]):
+                plt.text(j, i, f"{variable_weights[i, j]:.2f}", ha='center', va='center', color='black')
+        plt.show()
