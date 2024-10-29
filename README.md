@@ -55,10 +55,3 @@ python -m src.runOja
 ```bash
 python -m src.runHopfield
 ```
-
-### Config file
-```json
-{
-  
-}
-```
