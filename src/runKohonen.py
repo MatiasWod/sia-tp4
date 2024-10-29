@@ -23,7 +23,6 @@ som = Kohonen(
     map_size=map_size, 
     learning_rate=0.1, 
     sigma=3.0, 
-    normalization='zscore', 
     random_seed=41
 )
 som.train(standardized_features, epochs=500*input_dim)
